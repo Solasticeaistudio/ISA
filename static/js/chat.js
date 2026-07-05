@@ -1,4 +1,4 @@
-﻿const chatStream = document.querySelector("#chat-stream");
+const chatStream = document.querySelector("#chat-stream");
 const chatForm = document.querySelector("#chat-form");
 const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-button");
@@ -15,6 +15,12 @@ const scratchpad = document.querySelector("#scratchpad");
 let conversationId = null;
 let isLoading = false;
 let pinnedItems = [];
+const BASE_PATH = String(window.ISA_BASE_PATH || "").replace(/\/$/, "");
+
+function appUrl(path) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${BASE_PATH}${normalizedPath}`;
+}
 const OPENING_MESSAGE = "Hello, I'm ISA, Inogen's Support Assistant. Ask me about an Inogen model, manual, alarm, battery, column replacement, or FAA document.";
 
 function escapeHtml(value) {
@@ -37,7 +43,7 @@ function documentUrl(citation) {
   if (!relativePath) return "";
   const encodedPath = String(relativePath).split("/").map(encodeURIComponent).join("/");
   const page = Number(citation.page_number);
-  return `/api/document/${encodedPath}${page ? `#page=${page}` : ""}`;
+  return `${appUrl(`/api/document/${encodedPath}`)}${page ? `#page=${page}` : ""}`;
 }
 function scrollToBottom() {
   chatStream.scrollTo({ top: chatStream.scrollHeight, behavior: "smooth" });
@@ -212,7 +218,7 @@ async function sendMessage(message) {
   setLoading(true);
 
   try {
-    const response = await fetch("/api/chat", {
+    const response = await fetch(appUrl("/api/chat"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

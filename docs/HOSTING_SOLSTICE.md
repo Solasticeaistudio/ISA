@@ -1,6 +1,6 @@
-﻿# Hosting ISA Under solsticestudio.ai/isa
+# Hosting ISA Under solsticestudio.ai/isa
 
-This note describes how ISA could be hosted under the existing Solstice public Flask web server at `solsticestudio.ai/isa`. It is not implemented in this repo because deployment should be done deliberately with secrets, process management, and document access policies in place.
+This note describes how ISA can be hosted under the existing Solstice public Flask web server at `solsticestudio.ai/isa`. The ISA repo now supports subpath hosting, and the local Solstice `web_server.py` has a `/isa` reverse proxy that forwards to a separate ISA process. Deployment should still be done deliberately with secrets, process management, and document access policies in place.
 
 ## Short Answer
 
@@ -33,52 +33,35 @@ Proxying is cleaner because:
 - Public routes can be gated or removed quickly at the proxy layer.
 - It avoids route collisions with the existing Solstice app.
 
-## Required ISA Changes For `/isa`
+## ISA Base-Path Support
 
-ISA currently assumes it is mounted at the web root. To work cleanly under `/isa`, it should support an app base path.
+ISA supports an app base path for `/isa` hosting. The frontend reads `window.ISA_BASE_PATH`, API calls use that prefix, document source links use that prefix, and Flask trusts `X-Forwarded-Prefix` via `ProxyFix` when proxied.
 
-Useful changes:
-
-1. Add an environment variable:
+Useful deployment setting:
 
 ```env
-APPLICATION_ROOT=/isa
 ISA_BASE_PATH=/isa
 ```
 
-2. Make frontend fetches relative to the base path:
+If `ISA_BASE_PATH` is not set, ISA can still infer `/isa` from the proxy's `X-Forwarded-Prefix` header.
 
-```js
-fetch(`${window.ISA_BASE_PATH}/api/chat`, ...)
-```
+## Solstice Web Server Route
 
-3. Generate PDF links with the base path:
-
-```js
-`${window.ISA_BASE_PATH}/api/document/...`
-```
-
-4. Ensure Flask URL generation respects the prefix when proxied.
-
-A quick proxy can work without these changes if the web server rewrites paths, but base-path support is more reliable.
-
-## Required Solstice Web Server Changes
-
-In `C:\dev\Solstice-EIM\web_server.py`, add a proxy route before catch-all routes:
+In `C:\dev\Solstice-EIM\web_server.py`, the local route proxies `/isa`, `/isa/`, and `/isa/<path>` to ISA:
 
 ```python
-ISA_SERVICE_URL = os.environ.get("ISA_SERVICE_URL", "http://127.0.0.1:5010")
+ISA_UPSTREAM_URL = os.getenv("ISA_UPSTREAM_URL", "http://127.0.0.1:5010").rstrip("/")
 
 @app.route("/isa", defaults={"path": ""}, methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@app.route("/isa/", defaults={"path": ""}, methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 @app.route("/isa/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def isa_proxy(path):
-    target = f"{ISA_SERVICE_URL}/{path}"
-    # forward method, headers, query string, and body
-    # strip or normalize hop-by-hop headers
-    # return upstream response
+    upstream_path = f"/{path}" if path else "/"
+    upstream_url = f"{ISA_UPSTREAM_URL}{upstream_path}"
+    # forward request and send X-Forwarded-Prefix: /isa
 ```
 
-The existing web server already has several proxy examples, including API and service proxies. ISA should follow those patterns.
+The proxy should strip the `/isa` prefix before forwarding, preserve the request method, query string, body, and content type, and send `X-Forwarded-Prefix: /isa` so ISA can generate correct asset and source-document URLs.
 
 ## Process Management
 
@@ -86,6 +69,7 @@ ISA should run as a separate process on localhost, for example:
 
 ```powershell
 $env:PORT="5010"
+$env:ISA_BASE_PATH="/isa"
 python app.py
 ```
 
@@ -121,7 +105,7 @@ Do not expose private Inogen PDFs publicly unless there is permission to do so. 
 Time: 1-2 hours.
 
 - Run ISA on localhost port 5010.
-- Add `/isa` proxy route to `web_server.py`.
+- Use the `/isa` proxy route in `web_server.py`.
 - Add minimal path rewriting if needed.
 - Add temporary basic access control.
 - Smoke test chat and static assets.
@@ -130,8 +114,8 @@ Time: 1-2 hours.
 
 Time: 0.5-1 day.
 
-- Add base-path support to ISA.
-- Add proxy route.
+- Use ISA base-path support.
+- Use the Solstice proxy route.
 - Add auth/demo gate.
 - Add process manager.
 - Add health check.

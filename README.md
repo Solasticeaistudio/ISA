@@ -29,7 +29,6 @@ The project was built as an interview-ready MVP: the modules are intentionally s
 - [Design Decisions](#design-decisions)
 - [Known Limitations](#known-limitations)
 - [Future Improvements](#future-improvements)
-- [Interview Talking Points](#interview-talking-points)
 
 
 ## Project Companion Docs
@@ -200,30 +199,30 @@ ISA/
 +-- .gitignore                     # Public-repo-safe ignore rules
 +-- README.md                      # This documentation
 +-- knowledge/                     # User-provided PDFs live here locally
-¦   +-- manuals/
-¦   +-- accessories/
-¦   +-- procedures/
-¦   +-- getting_started/
-¦   +-- faa/
-¦   +-- troubleshooting/
-¦   +-- warranty/
+|   +-- manuals/
+|   +-- accessories/
+|   +-- procedures/
+|   +-- getting_started/
+|   +-- faa/
+|   +-- troubleshooting/
+|   +-- warranty/
 +-- ingest/
-¦   +-- ingest.py                  # CLI ingestion runner
-¦   +-- parser.py                  # Recursive PDF discovery and PyMuPDF extraction
-¦   +-- chunker.py                 # Page-aware chunking
-¦   +-- embedder.py                # Gemini embeddings with batching/retry logic
-¦   +-- utils.py                   # Metadata, IDs, logging, normalization
+|   +-- ingest.py                  # CLI ingestion runner
+|   +-- parser.py                  # Recursive PDF discovery and PyMuPDF extraction
+|   +-- chunker.py                 # Page-aware chunking
+|   +-- embedder.py                # Gemini embeddings with batching/retry logic
+|   +-- utils.py                   # Metadata, IDs, logging, normalization
 +-- rag/
-¦   +-- retriever.py               # Query embedding and Pinecone retrieval
-¦   +-- prompts.py                 # Grounded system prompt
-¦   +-- citations.py               # Citation formatting and deduplication
-¦   +-- memory.py                  # File-backed conversation memory
+|   +-- retriever.py               # Query embedding and Pinecone retrieval
+|   +-- prompts.py                 # Grounded system prompt
+|   +-- citations.py               # Citation formatting and deduplication
+|   +-- memory.py                  # File-backed conversation memory
 +-- templates/
-¦   +-- index.html                 # Main chat UI template
+|   +-- index.html                 # Main chat UI template
 +-- static/
-¦   +-- css/style.css              # Dark support-console theme
-¦   +-- js/chat.js                 # Frontend chat behavior
-¦   +-- wallpaper/isa-background.png
+|   +-- css/style.css              # Dark support-console theme
+|   +-- js/chat.js                 # Frontend chat behavior
+|   +-- wallpaper/isa-background.png
 +-- uploads/                       # Reserved for future upload support
 +-- conversations/                 # Local JSONL conversation logs, ignored by Git
 +-- logs/                          # Local app logs, ignored by Git
@@ -311,6 +310,7 @@ Notes:
 - `text-embedding-004` commonly uses `768` dimensions in this project configuration.
 - If you switch embedding models, verify the correct dimensionality and recreate or change the Pinecone index if needed.
 - `PINECONE_NAMESPACE` is optional. Leave it blank for the default namespace.
+- `ISA_BASE_PATH` is optional. Use `/isa` when serving ISA behind a subpath such as `solsticestudio.ai/isa`.
 
 ## Local Setup
 
@@ -868,21 +868,3 @@ High-value next steps:
 - Add evaluation questions and expected cited source pages.
 - Add source coverage reporting after ingestion.
 - Add per-document version metadata.
-
-## Interview Talking Points
-
-This project demonstrates:
-
-- building a complete RAG workflow from documents to chat UI
-- practical metadata design for grounded answers
-- deterministic vector IDs for repeatable ingestion
-- safe failure handling for bad PDFs and embedding errors
-- model prompting that constrains unsupported answers
-- source attribution that does not rely only on model text
-- a clean Flask API surface
-- frontend state handling without a heavy framework
-- public repository hygiene around secrets and private documents
-
-A concise architecture summary:
-
-> ISA ingests user-provided Inogen PDFs, extracts page text with PyMuPDF, chunks and embeds the text with Gemini, stores vectors and metadata in Pinecone, retrieves relevant chunks for each question, prompts Gemini to answer only from that retrieved context, and returns structured citations that link back to the source PDFs.

@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pathlib import Path
 from typing import Iterable
 
@@ -42,6 +42,9 @@ RETRIEVAL_TOP_K = int(os.getenv("RETRIEVAL_TOP_K", "6"))
 
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "change-me")
 FLASK_ENV = os.getenv("FLASK_ENV", "development")
+ISA_BASE_PATH = os.getenv("ISA_BASE_PATH", "").strip().rstrip("/")
+if ISA_BASE_PATH and not ISA_BASE_PATH.startswith("/"):
+    ISA_BASE_PATH = f"/{ISA_BASE_PATH}"
 
 for directory in (KNOWLEDGE_DIR, UPLOAD_DIR, CONVERSATIONS_DIR, LOGS_DIR, TEMPLATES_DIR, STATIC_DIR):
     directory.mkdir(parents=True, exist_ok=True)

@@ -1,10 +1,11 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import os
 from typing import Any
 
 from flask import Flask, abort, jsonify, render_template, request, send_from_directory
 from google import genai
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 import config
 from rag.citations import build_citations
@@ -24,6 +25,7 @@ SUGGESTED_PROMPTS = [
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 
 def _extract_model_text(response: Any) -> str:
@@ -58,6 +60,10 @@ def _generate_answer(question: str, context: str) -> str:
     return answer
 
 
+def _frontend_base_path() -> str:
+    base_path = config.ISA_BASE_PATH or request.script_root or ""
+    return base_path.rstrip("/")
+
 def _knowledge_pdf_count() -> int:
     if not config.KNOWLEDGE_DIR.exists():
         return 0
@@ -66,7 +72,11 @@ def _knowledge_pdf_count() -> int:
 
 @app.get("/")
 def index():
-    return render_template("index.html", suggested_prompts=SUGGESTED_PROMPTS)
+    return render_template(
+        "index.html",
+        base_path=_frontend_base_path(),
+        suggested_prompts=SUGGESTED_PROMPTS,
+    )
 
 
 @app.get("/api/health")

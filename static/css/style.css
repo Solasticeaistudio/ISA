@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --rail-left: 20px;
   --rail-width: 28px;
   --rail-gap: 16px;
@@ -24,7 +24,7 @@ body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text-primary);
-  background: #06152f url('/static/wallpaper/isa-background.png') center / cover fixed no-repeat;
+  background: #06152f var(--isa-background-image, url('/static/wallpaper/isa-background.png')) center / cover fixed no-repeat;
   overflow: hidden;
 }
 
