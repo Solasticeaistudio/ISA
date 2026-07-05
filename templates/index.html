@@ -1,0 +1,126 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ISA - Inogen Support Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=solstyle-20260704-3">
+</head>
+<body>
+  <div class="app-frame">
+    <div class="glass-window">
+      <div class="light-rail-wrap" aria-hidden="true">
+        <div class="rail-dots"><span></span><span></span><span></span></div>
+        <div class="light-rail"></div>
+      </div>
+
+      <main class="chat-workspace">
+        <header class="sol-header">
+          <button class="icon-button new-chat-button" id="new-chat-button" type="button" title="New chat" aria-label="New chat">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          </button>
+          <div class="header-title">
+            <h1>ISA</h1>
+            <p>Inogen Support Assistant</p>
+          </div>
+          <div class="status-pill"><span></span> Grounded RAG</div>
+        </header>
+
+        <section class="prompt-strip" aria-label="Suggested prompts">
+          {% for prompt in suggested_prompts %}
+            <button class="prompt-card" type="button" data-prompt="{{ prompt }}">{{ prompt }}</button>
+          {% endfor %}
+        </section>
+
+        <section class="chat-stream" id="chat-stream" aria-live="polite">
+          <article class="message assistant-message">
+            <div class="avatar">ISA</div>
+            <div class="message-body">
+              <div class="bubble">
+                <button class="pin-button" type="button" title="Pin message" aria-label="Pin message">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"></path><path d="M2.5 15a9.5 9.5 0 0 1 19 0"></path><path d="M12 15v1a2 2 0 0 1-2 2H8a2 2 0 0 0-2 2v1h12v-1a2 2 0 0 0-2-2h-2a2 2 0 0 1-2-2z"></path></svg>
+                </button>
+                <div class="message-content">Ready for Inogen documentation questions. Retrieved citations will appear as source pearls.</div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <form class="composer" id="chat-form">
+          <textarea id="message-input" rows="1" placeholder="Ask ISA about manuals, alarms, batteries, columns, FAA approval..." aria-label="Message"></textarea>
+          <button class="icon-button send-button" id="send-button" type="submit" title="Send" aria-label="Send message">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg>
+          </button>
+        </form>
+      </main>
+
+      <aside class="source-panel" aria-label="ISA controls and sources">
+        <div class="panel-section panel-brand">
+          <div class="brand-mark">ISA</div>
+          <div>
+            <p class="brand-name">Support Console</p>
+            <p class="brand-subtitle">Inogen documentation RAG</p>
+          </div>
+        </div>
+
+        <div class="panel-section filters" aria-label="Search filters">
+          <label>
+            <span>Product</span>
+            <select id="product-select">
+              <option>All Products</option>
+              <option>Rove 4</option>
+              <option>Rove 6</option>
+              <option>G4</option>
+              <option>G5</option>
+              <option>At Home</option>
+              <option>Voxi 5</option>
+            </select>
+          </label>
+          <label>
+            <span>Category</span>
+            <select id="category-select">
+              <option>All Categories</option>
+              <option value="manuals">Manuals</option>
+              <option value="accessories">Accessories</option>
+              <option value="procedures">Procedures</option>
+              <option value="getting_started">Getting Started</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="panel-section source-pearls">
+          <div class="section-heading">
+            <p class="section-title">Source Pearls</p>
+            <span id="source-count">0</span>
+          </div>
+          <div id="source-pearls-list" class="source-pearls-list">
+            <div class="empty-state">Ask a question to collect cited source pearls here.</div>
+          </div>
+        </div>
+
+        <div class="panel-section pinboard">
+          <div class="section-heading">
+            <p class="section-title">Pinboard</p>
+            <button id="clear-pins" type="button">Clear</button>
+          </div>
+          <div id="pinboard-list" class="pinboard-list">
+            <div class="empty-state">Pinned answer excerpts will appear here.</div>
+          </div>
+        </div>
+
+        <div class="panel-section scratchpad-section">
+          <label for="scratchpad" class="section-title">Scratchpad</label>
+          <textarea id="scratchpad" rows="5" placeholder="Quick notes..."></textarea>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/chat.js') }}?v=solstyle-20260704-3"></script>
+</body>
+</html>
+
+

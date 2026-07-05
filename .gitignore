@@ -1,0 +1,44 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Runtime data
+logs/*
+!logs/.gitkeep
+uploads/*
+!uploads/.gitkeep
+conversations/*
+!conversations/.gitkeep
+output/
+models/
+
+# User-provided or proprietary document files
+*.pdf
+knowledge/**/*.pdf
+!knowledge/**/.gitkeep
+
+# Legacy/local scratch tree not used by the ISA Flask app
+src/
+
+# Superseded local background asset
+static/wallpaper/sol-3.png
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
