@@ -8,6 +8,7 @@ from google import genai
 
 import config
 from rag.citations import build_citations
+from rag.clarification import MODEL_CLARIFICATION_RESPONSE, should_ask_for_model
 from rag.memory import save_conversation_turn
 from rag.prompts import build_chat_prompt
 from rag.retriever import format_context, retrieve_context
@@ -129,6 +130,22 @@ def chat():
     conversation_id = payload.get("conversation_id") or None
 
     try:
+        if should_ask_for_model(message, product):
+            saved_conversation_id = save_conversation_turn(
+                conversation_id,
+                message,
+                MODEL_CLARIFICATION_RESPONSE,
+                [],
+            )
+            return jsonify(
+                {
+                    "answer": MODEL_CLARIFICATION_RESPONSE,
+                    "citations": [],
+                    "conversation_id": saved_conversation_id,
+                    "needs_clarification": True,
+                }
+            )
+
         matches = retrieve_context(
             message,
             top_k=config.RETRIEVAL_TOP_K,
@@ -165,4 +182,5 @@ def chat():
 if __name__ == "__main__":
     port = int(os.getenv("PORT", os.getenv("FLASK_RUN_PORT", "5000")))
     app.run(debug=config.FLASK_ENV == "development", host="127.0.0.1", port=port)
+
 

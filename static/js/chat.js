@@ -15,6 +15,7 @@ const scratchpad = document.querySelector("#scratchpad");
 let conversationId = null;
 let isLoading = false;
 let pinnedItems = [];
+const OPENING_MESSAGE = "Hello, I'm ISA, Inogen's Support Assistant. Ask me about an Inogen model, manual, alarm, battery, column replacement, or FAA document.";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -272,7 +273,7 @@ newChatButton.addEventListener("click", () => {
           <button class="pin-button" type="button" title="Pin message" aria-label="Pin message">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v6"></path><path d="M2.5 15a9.5 9.5 0 0 1 19 0"></path><path d="M12 15v1a2 2 0 0 1-2 2H8a2 2 0 0 0-2 2v1h12v-1a2 2 0 0 0-2-2h-2a2 2 0 0 1-2-2z"></path></svg>
           </button>
-          <div class="message-content">Ready for Inogen documentation questions. Retrieved citations will appear as source pearls.</div>
+          <div class="message-content">${OPENING_MESSAGE}</div>
         </div>
       </div>
     </article>
@@ -289,5 +290,6 @@ scratchpad.addEventListener("input", () => localStorage.setItem("isa_scratchpad"
 
 chatStream.querySelectorAll(".assistant-message").forEach(attachPinHandler);
 renderPinboard();
+
 
 
