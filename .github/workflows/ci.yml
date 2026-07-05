@@ -1,0 +1,52 @@
+﻿name: ISA CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate Python and frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Compile Python modules
+        run: |
+          python -m py_compile \
+            app.py \
+            config.py \
+            ingest/ingest.py \
+            ingest/parser.py \
+            ingest/chunker.py \
+            ingest/embedder.py \
+            ingest/utils.py \
+            rag/retriever.py \
+            rag/prompts.py \
+            rag/citations.py \
+            rag/memory.py \
+            rag/clarification.py
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check frontend JavaScript syntax
+        run: node --check static/js/chat.js
